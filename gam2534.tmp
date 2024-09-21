@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3slx3ourwhqx"]
+
+[ext_resource type="Script" path="res://game_of_life.gd" id="1_myute"]
+
+[node name="game" type="Node2D"]
+
+[node name="Canvas" type="Node2D" parent="."]
+script = ExtResource("1_myute")
+grid_size = Vector2i(32, 32)
+cell_size = Vector2i(20, 20)

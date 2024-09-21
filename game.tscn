@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3 uid="uid://c3slx3ourwhqx"]
+
+[ext_resource type="Shader" path="res://grid.gdshader" id="1_c7b2y"]
+[ext_resource type="Script" path="res://game_of_life.gd" id="1_myute"]
+
+[sub_resource type="Gradient" id="Gradient_w3rdx"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.508197)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jx2so"]
+gradient = SubResource("Gradient_w3rdx")
+fill_to = Vector2(1, 0.00537634)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eo0sy"]
+shader = ExtResource("1_c7b2y")
+shader_parameter/grid_size = Vector2(10, 10)
+shader_parameter/alive_color = Vector4(1, 1, 1, 1)
+shader_parameter/dead_color = Vector4(0, 0, 0, 0)
+shader_parameter/cells = SubResource("GradientTexture2D_jx2so")
+
+[sub_resource type="Gradient" id="Gradient_vjmlu"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0tyia"]
+gradient = SubResource("Gradient_vjmlu")
+width = 128
+height = 128
+fill_from = Vector2(0.472477, 0.00458716)
+fill_to = Vector2(0.972477, 0)
+
+[node name="game" type="Node2D"]
+
+[node name="Canvas" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_eo0sy")
+texture = SubResource("GradientTexture2D_0tyia")
+centered = false
+script = ExtResource("1_myute")
+grid_size = Vector2i(60, 40)
+cell_size = Vector2i(14, 14)
+grid_color = Color(0.174607, 0.14347, 0.357366, 1)
+is_simulation_paused = true
