@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://c3slx3ourwhqx"]
+[gd_scene load_steps=10 format=3 uid="uid://c3slx3ourwhqx"]
 
 [ext_resource type="Shader" path="res://grid.gdshader" id="1_c7b2y"]
 [ext_resource type="Script" path="res://game_of_life.gd" id="1_myute"]
+[ext_resource type="Script" path="res://ui.gd" id="3_itbrl"]
 
 [sub_resource type="Gradient" id="Gradient_w3rdx"]
 interpolation_mode = 1
@@ -15,17 +16,24 @@ fill_to = Vector2(1, 0.00537634)
 shader = ExtResource("1_c7b2y")
 shader_parameter/grid_size = Vector2(10, 10)
 shader_parameter/alive_color = Vector4(1, 1, 1, 1)
-shader_parameter/dead_color = Vector4(0, 0, 0, 0)
+shader_parameter/dead_color = Vector4(0, 0, 0, 1)
+shader_parameter/border_color = Vector4(0.5, 0.5, 0.5, 1)
 shader_parameter/cells = SubResource("GradientTexture2D_jx2so")
 
 [sub_resource type="Gradient" id="Gradient_vjmlu"]
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_0tyia"]
 gradient = SubResource("Gradient_vjmlu")
-width = 128
-height = 128
+width = 840
+height = 560
 fill_from = Vector2(0.472477, 0.00458716)
 fill_to = Vector2(0.972477, 0)
+
+[sub_resource type="LabelSettings" id="LabelSettings_c7wno"]
+font_size = 40
+font_color = Color(1, 1, 1, 0.392157)
+outline_size = 1
+outline_color = Color(0, 0, 0, 1)
 
 [node name="game" type="Node2D"]
 
@@ -37,4 +45,112 @@ script = ExtResource("1_myute")
 grid_size = Vector2i(60, 40)
 cell_size = Vector2i(14, 14)
 grid_color = Color(0.174607, 0.14347, 0.357366, 1)
-is_simulation_paused = true
+simulation_fps = 10.0
+
+[node name="TabContainer" type="TabContainer" parent="."]
+offset_left = 856.0
+offset_top = 9.0
+offset_right = 1045.0
+offset_bottom = 98.0
+size_flags_horizontal = 3
+current_tab = 0
+clip_tabs = false
+script = ExtResource("3_itbrl")
+
+[node name="Simulation" type="HBoxContainer" parent="TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="pause" type="VBoxContainer" parent="TabContainer/Simulation"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Simulation/pause"]
+layout_mode = 2
+text = "Paused
+"
+
+[node name="checkbox" type="CheckBox" parent="TabContainer/Simulation/pause"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="TabContainer/Simulation"]
+layout_mode = 2
+
+[node name="fps" type="VBoxContainer" parent="TabContainer/Simulation"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Simulation/fps"]
+layout_mode = 2
+text = "Ticks / s"
+
+[node name="input" type="LineEdit" parent="TabContainer/Simulation/fps"]
+layout_mode = 2
+text = "3"
+placeholder_text = "30"
+virtual_keyboard_type = 2
+
+[node name="VSeparator2" type="VSeparator" parent="TabContainer/Simulation"]
+layout_mode = 2
+
+[node name="wrap" type="VBoxContainer" parent="TabContainer/Simulation"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Simulation/wrap"]
+layout_mode = 2
+text = "Wrapped"
+
+[node name="checkbox" type="CheckBox" parent="TabContainer/Simulation/wrap"]
+layout_mode = 2
+
+[node name="Reset" type="Button" parent="TabContainer/Simulation"]
+layout_mode = 2
+text = "Reset"
+
+[node name="Display" type="HBoxContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="alive color" type="VBoxContainer" parent="TabContainer/Display"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Display/alive color"]
+layout_mode = 2
+text = "Alive"
+
+[node name="color" type="ColorPickerButton" parent="TabContainer/Display/alive color"]
+custom_minimum_size = Vector2(10, 30)
+layout_mode = 2
+
+[node name="dead color" type="VBoxContainer" parent="TabContainer/Display"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Display/dead color"]
+layout_mode = 2
+text = "Dead
+"
+
+[node name="color2" type="ColorPickerButton" parent="TabContainer/Display/dead color"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="grid color" type="VBoxContainer" parent="TabContainer/Display"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Display/grid color"]
+layout_mode = 2
+text = "Grid
+"
+
+[node name="color3" type="ColorPickerButton" parent="TabContainer/Display/grid color"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Paused Label" type="Label" parent="."]
+offset_left = 196.0
+offset_top = 251.0
+offset_right = 652.0
+offset_bottom = 306.0
+text = "SIMULATION IS PAUSED"
+label_settings = SubResource("LabelSettings_c7wno")
+horizontal_alignment = 1
+vertical_alignment = 1

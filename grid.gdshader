@@ -2,14 +2,12 @@ shader_type canvas_item;
 
 uniform vec2 grid_size = vec2(10, 10);
 uniform vec4 alive_color = vec4(1.0);
-uniform vec4 dead_color = vec4(0.0);
+uniform vec4 dead_color = vec4(vec3(0.0), 1.0);
+uniform vec4 border_color = vec4(vec3(0.5), 1.0);
 
-uniform sampler2D cells : source_color, filter_nearest;
+uniform sampler2D cells : filter_nearest;
 
-//vec2 grid(vec2 uv, float columns, float rows){
-	//return fract(vec2(uv.x * columns, uv.y * rows));
-//}
-
+// https://godotshaders.com/snippet/squares/
 vec4 square_rounded(vec2 uv, float width, float radius){
 	uv = uv * 2.0 - 1.0;
 	
@@ -20,14 +18,12 @@ vec4 square_rounded(vec2 uv, float width, float radius){
 	return vec4(vec3(square), 1.0);
 }
 
-
 void fragment() {
 	vec2 grid = fract(UV * grid_size);
 	float cell = texture(cells, vec2(UV)).r;
 	
-	float m = 1.0 - square_rounded(grid, 1, 0.4).x;
-	
-	vec4 c = mix(dead_color, alive_color, cell * m);
+	vec4 c = mix(dead_color, alive_color, cell);
+	c = mix(c, border_color, square_rounded(grid, 0.90, 0.4));
 	
     COLOR = c;
 }

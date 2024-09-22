@@ -1,4 +1,5 @@
 extends Sprite2D
+class_name Game
 
 
 @export_category("Size")
@@ -14,6 +15,7 @@ extends Sprite2D
 @export_category("Simulation")
 @export var simulation_fps: float = 3.0
 @export var is_simulation_paused: bool = false
+@export var is_warped: bool = true
 
 var time = 0
 
@@ -21,6 +23,7 @@ var time = 0
 class Grid:
 	var grid: Array[Array] = []
 	var size: Vector2i
+	var is_warped: bool = true
 	
 	static func create_empty(size: Vector2i) -> Grid:
 		var obj := Grid.new()
@@ -37,15 +40,20 @@ class Grid:
 		
 	func get_value(pos: Vector2i) -> bool:
 		var x := pos.x
-		if x < 0:
-			x += size.x
-		if x >= size.x:
-			x -= size.x
 		var y := pos.y
-		if y < 0:
-			y += size.y
-		if y >= size.y:
-			y -= size.y
+		if is_warped:
+			if x < 0:
+				x += size.x
+			if x >= size.x:
+				x -= size.x
+			if y < 0:
+				y += size.y
+			if y >= size.y:
+				y -= size.y
+		else:
+			if x < 0 or x >= size.x or y < 0 or y >= size.y:
+				return false
+				
 		return grid[x][y]
 		
 	func alive_neighbors_count(pos: Vector2i) -> int:
@@ -76,16 +84,19 @@ var state_image: Image
 func _ready() -> void:
 	state = Grid.create_empty(grid_size)
 	# glider
-	#state.set_value(Vector2i(10, 2), true)
-	#state.set_value(Vector2i(11, 3), true)
-	#state.set_value(Vector2i(12, 1), true)
-	#state.set_value(Vector2i(12, 2), true)
-	#state.set_value(Vector2i(12, 3), true)
+	state.set_value(Vector2i(10, 2), true)
+	state.set_value(Vector2i(11, 3), true)
+	state.set_value(Vector2i(12, 1), true)
+	state.set_value(Vector2i(12, 2), true)
+	state.set_value(Vector2i(12, 3), true)
 	
 	future_state = Grid.create_empty(grid_size)
 	_update_texture_size()
 	_update_cells()
 	
+func reset() -> void:
+	state = Grid.create_empty(grid_size)
+	_update_cells()
 	
 func _update_texture_size() -> void:
 	var image := Image.create_empty(grid_size.x * cell_size.x, grid_size.y * cell_size.y, false, Image.FORMAT_RGBA8)
@@ -96,8 +107,12 @@ func _update_texture_size() -> void:
 	state_image = Image.create_empty(grid_size.x, grid_size.y, false, Image.FORMAT_R8)
 	
 	material.set("shader_parameter/grid_size", grid_size)
+	update_colors()
+	
+func update_colors() -> void:
 	material.set("shader_parameter/alive_color", cell_alive_color)
 	material.set("shader_parameter/dead_color", cell_dead_color)
+	material.set("shader_parameter/border_color", grid_color)
 
 func _update_cells() -> void:
 	
@@ -107,7 +122,9 @@ func _update_cells() -> void:
 			var pos := Vector2i(i, j)
 			var is_alive := state.get_value(pos)
 			if is_alive:
-				state_image.set_pixel(pos.x, pos.y, Color.WHITE)
+				state_image.set_pixelv(pos, Color.WHITE)
+			#else:
+				#state_image.set_pixelv(pos, state_image.get_pixelv(pos).darkened(0.5))
 	
 	material.set("shader_parameter/cells", ImageTexture.create_from_image(state_image))
 
@@ -117,8 +134,8 @@ func _process(delta: float) -> void:
 	if !is_simulation_paused:
 		time += delta
 		
-	if Input.is_action_just_pressed("ui_accept"):
-		is_simulation_paused = !is_simulation_paused
+	#if Input.is_action_just_pressed("ui_accept"):
+		#is_simulation_paused = !is_simulation_paused
 		
 	
 	var tick_time = 1 / simulation_fps
@@ -141,7 +158,7 @@ func _mouse_clicked(local_pos: Vector2) -> void:
 	_update_cells()
 
 func tick() -> void:
-	
+	state.is_warped = is_warped
 	future_state = future_state.create_empty(grid_size)
 	for i in grid_size.x: 
 		for j in grid_size.y:
